@@ -2,7 +2,8 @@ module Main where
 
 import Prelude
 import Data.List
-import Data.Monoid ( class Monoid, mempty )
+import Data.Monoid (class Monoid, mempty)
+import Data.Monoid.Endo
 import Data.Newtype hiding (traverse)
 import Control.Monad.Eff (Eff)
 import Control.Monad.Eff.Console (CONSOLE, log)
@@ -31,5 +32,8 @@ instance monoidApply :: Monoid m => Apply (Const m) where
 instance monoidApplicative :: Monoid m => Applicative (Const m) where
   pure _ = Const mempty
 
-{-- foldMap :: forall a t m. (Traversable t, Monoid m) => (a -> m) -> t a -> m --}
-{-- foldMap f = const <<< traverse (Const <<< f) --}
+foldMap :: forall a f m. (Traversable f, Monoid m) => (a -> m) -> f a -> m
+foldMap f = unwrap <<< traverse (Const <<< f)
+
+foldr :: forall a b t. Traversable t => (a -> b -> b) -> b -> t a -> b
+foldr f seed ta = unwrap (foldMap (Endo <<< f) ta) seed
