@@ -1,8 +1,10 @@
 module Main where
 
-import Prelude
+import Prelude hiding (min, max)
+import Global (infinity)
 import Control.Alt
 import Data.Boolean
+import Data.Semiring
 import Data.Maybe
 import Data.List hiding (foldr, foldl, foldMap)
 import Data.Monoid (class Monoid, mempty)
@@ -85,3 +87,42 @@ instance andMonoid :: Monoid And where
 
 all :: forall a t. Traversable t => (a -> Boolean) -> t a -> Boolean
 all f = unwrap <<< foldMap (And <<< f)
+
+{-- # Todo (homework):
+    (signatures mine)
+    * min :: forall a t. Traversable t, Ord a => t a -> a
+    * max :: forall a t. Traversable t, Ord a => t a -> a
+    * sum :: forall a t. Traversable t, Semiring a => t a -> a
+    * lastest :: forall a t. Traversable t => t a -> a
+      last element
+    * average :: forall a t. Traversable t, EuclideanRing a => t a -> a
+--}
+
+{-- lastest :: forall a t. Traversable t => t a -> Maybe a --}
+{-- lastest ta = unwrap <<< foldr (\a b -> b `append` First a) mempty ta --}
+
+newtype Add a = Add a
+
+derive instance newtypeAdd :: Newtype (Add a) _
+
+instance addSemigroup :: Semiring a => Semigroup (Add a) where
+  append (Add a) (Add b) = Add (a `add` b)
+
+instance addMonoid :: Semiring a => Monoid (Add a) where
+  mempty = Add zero
+
+sum :: forall a t. (Traversable t, Semiring a) => t a -> a
+sum = unwrap <<< foldMap Add
+
+
+newtype Min a = Min a
+derive instance newtypeMin :: Newtype (Min a) _
+
+instance minSemigroup :: Semigroup (Min Number) where
+  append (Min a) (Min b) = Min (if a < b then a else b)
+
+instance minMonoid :: Monoid (Min Number) where
+  mempty = Min infinity
+
+min :: forall a t. Traversable t => t Number -> Number
+min = unwrap <<< foldMap Min
