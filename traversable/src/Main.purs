@@ -1,6 +1,8 @@
 module Main where
 
 import Prelude hiding (min, max)
+import Data.Tuple (Tuple(..), uncurry )
+import Data.Int (toNumber)
 import Global (infinity)
 import Control.Alt
 import Data.Boolean
@@ -98,9 +100,6 @@ all f = unwrap <<< foldMap (And <<< f)
     * average :: forall a t. Traversable t, EuclideanRing a => t a -> a
 --}
 
-{-- lastest :: forall a t. Traversable t => t a -> Maybe a --}
-{-- lastest ta = unwrap <<< foldr (\a b -> b `append` First a) mempty ta --}
-
 newtype Add a = Add a
 
 derive instance newtypeAdd :: Newtype (Add a) _
@@ -126,3 +125,35 @@ instance minMonoid :: Monoid (Min Number) where
 
 min :: forall a t. Traversable t => t Number -> Number
 min = unwrap <<< foldMap Min
+
+newtype Max a = Max a
+derive instance newtypeMax :: Newtype (Max a) _
+
+instance maxSemigroup :: Semigroup (Max Number) where
+  append (Max a) (Max b) = Max (if a > b then a else b)
+
+instance maxMonoid :: Monoid (Max Number) where
+  mempty = Max (-infinity)
+
+max :: forall a t. Traversable t => t Number -> Number
+max = unwrap <<< foldMap Max
+
+newtype Average = Average (Tuple Int Int)
+instance newtypeAverage :: Newtype Average (Tuple Int Int) where
+  wrap = Average
+  unwrap (Average tuple) = tuple
+
+mkAvg :: Int -> Average
+mkAvg n = Average (Tuple n 1)
+
+instance averageSemigroup :: Semigroup Average where
+  append (Average (Tuple sum count)) (Average (Tuple sum' count')) = Average (Tuple (sum + sum') (count + count'))
+
+instance averageMonoid :: Monoid Average where
+  mempty = Average (Tuple 0 0)
+
+average :: forall a t. Traversable t => t Int -> Number
+average = (\(Tuple a b) -> toNumber a / toNumber b) <<< unwrap <<< foldMap mkAvg
+
+lastest :: forall a t. Traversable t => t a -> Maybe a
+lastest = unwrap <<< foldr (\a b -> b `append` First (Just a)) mempty
