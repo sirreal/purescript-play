@@ -14,17 +14,19 @@ class Fluffy f where
 -- Exercise 1
 -- Relative Difficulty: 1
 instance fluffyList :: Fluffy List where
-  furry = unsafeCoerce "todo"
+  furry _ Nil         = Nil
+  furry f (Cons x xs) = Cons (f x) (furry f xs)
 
 -- Exercise 2
 -- Relative Difficulty: 1
 instance fluffyMaybe :: Fluffy Maybe where
-  furry = unsafeCoerce "todo"
+  furry _ Nothing = Nothing
+  furry f (Just x) = Just (f x)
 
 -- Exercise 3
 -- Relative Difficulty: 5
 instance fluffyFunction :: Fluffy ((->) t) where
-  furry = unsafeCoerce "todo"
+  furry = (<<<)
 
 newtype EitherLeft b a = EitherLeft (Either a b)
 newtype EitherRight a b = EitherRight (Either a b)
@@ -48,13 +50,13 @@ class Misty m where
   furry' :: forall a b. (a -> b) -> m a -> m b
 
 defaultMistyFurry' :: forall a b m. Misty m => (a -> b) -> m a -> m b
-defaultMistyFurry' = unsafeCoerce "todo"
+defaultMistyFurry' f = banana (unicorn <<< f)
 
 -- Exercise 7
 -- Relative Difficulty: 2
 instance mistyList :: Misty List where
-  banana = unsafeCoerce "todo"
-  unicorn = unsafeCoerce "todo"
+  banana = concatMap
+  unicorn x = Cons x Nil
   furry' = defaultMistyFurry'
 
 -- Exercise 8
