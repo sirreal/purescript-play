@@ -43,7 +43,7 @@ instance fluffyEitherRight :: Fluffy (EitherRight t) where
 
 class Misty m where
   banana :: forall a b. (a -> m b) -> m a -> m b
-  unicorn :: forall a b. a -> m a
+  unicorn :: forall a. a -> m a
   -- Exercise 6
   -- Relative Difficulty: 3
   -- (use banana and/or unicorn)
@@ -57,40 +57,41 @@ defaultMistyFurry' f = banana (unicorn <<< f)
 instance mistyList :: Misty List where
   banana = concatMap
   unicorn x = Cons x Nil
-  furry' = defaultMistyFurry'
+  furry' f ma = defaultMistyFurry' f ma
 
 -- Exercise 8
 -- Relative Difficulty: 2
 instance mistyMaybe :: Misty Maybe where
-  banana = unsafeCoerce "todo"
-  unicorn = unsafeCoerce "todo"
-  furry' = defaultMistyFurry'
+  banana _ Nothing  = Nothing
+  banana f (Just x) = f x
+  unicorn = Just
+  furry' f ma = defaultMistyFurry' f ma
 
 -- Exercise 9
 -- Relative Difficulty: 6
 instance mistyFunc :: Misty ((->) t) where
   banana = unsafeCoerce "todo"
   unicorn = unsafeCoerce "todo"
-  furry' = defaultMistyFurry'
+  furry' f ma = defaultMistyFurry' f ma
 
 -- Exercise 10
 -- Relative Difficulty: 6
 instance mistyEitherLeft :: Misty (EitherLeft t) where
   banana = unsafeCoerce "todo"
   unicorn = unsafeCoerce "todo"
-  furry' = defaultMistyFurry'
+  furry' f ma = defaultMistyFurry' f ma
 
 -- Exercise 11
 -- Relative Difficulty: 6
 instance mistyEitherRight :: Misty (EitherRight t) where
   banana = unsafeCoerce "todo"
   unicorn = unsafeCoerce "todo"
-  furry' = defaultMistyFurry'
+  furry' f ma = defaultMistyFurry' f ma
 
 -- Exercise 12
 -- Relative Difficulty: 3
 jellybean :: forall a m. Misty m => m (m a) -> m a
-jellybean = unsafeCoerce "todo"
+jellybean = banana id
 
 -- Exercise 13
 -- Relative Difficulty: 6
@@ -140,4 +141,4 @@ instance fluffyState :: Fluffy (State s) where
 instance mistyState :: Misty (State s) where
   banana = unsafeCoerce "todo"
   unicorn = unsafeCoerce "todo"
-  furry' = defaultMistyFurry'
+  furry' f ma = defaultMistyFurry' f ma
