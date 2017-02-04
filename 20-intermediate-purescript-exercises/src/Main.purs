@@ -34,12 +34,14 @@ newtype EitherRight a b = EitherRight (Either a b)
 -- Exercise 4
 -- Relative Difficulty: 5
 instance fluffyEitherLeft :: Fluffy (EitherLeft t) where
-  furry = unsafeCoerce "todo"
+  furry _ (EitherLeft (Right x)) = EitherLeft (Right x)
+  furry f (EitherLeft (Left x)) = EitherLeft (Left (f x))
 
 -- Exercise 5
 -- Relative Difficulty: 5
 instance fluffyEitherRight :: Fluffy (EitherRight t) where
-  furry = unsafeCoerce "todo"
+  furry _ (EitherRight (Left x)) = EitherRight (Left x)
+  furry f (EitherRight (Right x)) = EitherRight (Right (f x))
 
 class Misty m where
   banana :: forall a b. (a -> m b) -> m a -> m b
@@ -71,21 +73,23 @@ instance mistyMaybe :: Misty Maybe where
 -- Relative Difficulty: 6
 instance mistyFunc :: Misty ((->) t) where
   banana = unsafeCoerce "todo"
-  unicorn = unsafeCoerce "todo"
+  unicorn = const
   furry' f ma = defaultMistyFurry' f ma
 
 -- Exercise 10
 -- Relative Difficulty: 6
 instance mistyEitherLeft :: Misty (EitherLeft t) where
-  banana = unsafeCoerce "todo"
-  unicorn = unsafeCoerce "todo"
+  banana f (EitherLeft (Left x)) = f x
+  banana _ (EitherLeft (Right x)) = EitherLeft (Right x)
+  unicorn = EitherLeft <<< Left
   furry' f ma = defaultMistyFurry' f ma
 
 -- Exercise 11
 -- Relative Difficulty: 6
 instance mistyEitherRight :: Misty (EitherRight t) where
-  banana = unsafeCoerce "todo"
-  unicorn = unsafeCoerce "todo"
+  banana f (EitherRight (Right x)) = f x
+  banana _ (EitherRight (Left x)) = EitherRight (Left x)
+  unicorn = EitherRight <<< Right
   furry' f ma = defaultMistyFurry' f ma
 
 -- Exercise 12
