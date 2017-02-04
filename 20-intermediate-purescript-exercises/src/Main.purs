@@ -100,7 +100,7 @@ jellybean = banana id
 -- Exercise 13
 -- Relative Difficulty: 6
 apple :: forall a b m. Misty m => m a -> m (a -> b) -> m b
-apple = unsafeCoerce "todo"
+apple ma mfab = banana ((flip furry') ma) mfab
 
 -- Exercise 14
 -- Relative Difficulty: 6
