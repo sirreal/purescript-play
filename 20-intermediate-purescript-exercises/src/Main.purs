@@ -105,13 +105,7 @@ apple ma mfab = banana ((flip furry') ma) mfab
 -- Exercise 14
 -- Relative Difficulty: 6
 moppy :: forall a b m. Misty m => List a -> (a -> m b) -> m (List b)
-moppy la f = moppy'' (moppy' la f)
-
-moppy' :: forall a b m. Misty m => List a -> (a -> m b) -> List (m b)
-moppy' xs famb = map famb xs
-
-moppy'' :: forall b m. Misty m => List (m b) -> m (List b)
-moppy'' = unsafeCoerce "todo"
+moppy f = unsafeCoerce "todo"
 
 -- Exercise 15
 -- Relative Difficulty: 6
