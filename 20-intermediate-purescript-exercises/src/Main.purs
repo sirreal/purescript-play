@@ -134,18 +134,25 @@ banana3 f ma mb mc = apple mc (banana2 f ma mb)
 banana4 :: forall a b c d e m. Misty m => (a -> b -> c -> d -> e) -> m a -> m b -> m c -> m d -> m e
 banana4 f ma mb mc md = apple md (banana3 f ma mb mc)
 
-newtype State s a = State s a
+newtype State s a = State { state :: s -> Tuple s a }
 
-derive instance newtypeState :: Newtype (State (Tuple s a)) _
+instance newtypeState :: Newtype (State s a) { state :: s -> Tuple s a } where
+  wrap = State
+  unwrap (State s) = s
 
 -- Exercise 19
 -- Relative Difficulty: 9
 instance fluffyState :: Fluffy (State s) where
-  furry f s = State (\x -> Tuple x (f ((unwrap s) x)))
+  furry f state = State { state: \s -> let prev = (unwrap state) s
+                                       in  Tuple (fst prev) (f (snd prev))
+                  }
 
 -- Exercise 20
 -- Relative Difficulty: 10
 instance mistyState :: Misty (State s) where
-  banana f s = f (unwrap s)
-  unicorn x = State (\s -> Tuple s x)
+  banana f s =
+    let prev = unwrap s
+        next x = \y -> let tab = prev x in Tuple y (unwrap f (snd tab))
+    in  State { state: next }
+  unicorn x = State { state: \s -> Tuple s x }
   furry' f ma = defaultMistyFurry' f ma
