@@ -105,31 +105,33 @@ apple ma mfab = banana ((flip furry') ma) mfab
 -- Exercise 14
 -- Relative Difficulty: 6
 moppy :: forall a b m. Misty m => List a -> (a -> m b) -> m (List b)
-moppy f = unsafeCoerce "todo"
+moppy xs f = foldr f' (unicorn Nil) xs
+  where
+    f' el acc = apple acc (furry' Cons (f el))
 
 -- Exercise 15
 -- Relative Difficulty: 6
 -- (bonus: use moppy)
 sausage :: forall a m. Misty m => List (m a) -> m (List a)
-sausage = unsafeCoerce "todo"
+sausage = (flip moppy) (furry' id)
 
 -- Exercise 16
 -- Relative Difficulty: 6
 -- (bonus: use apple + furry')
 banana2 :: forall a b c m. Misty m => (a -> b -> c) -> m a -> m b -> m c
-banana2 = unsafeCoerce "todo"
+banana2 f ma mb = apple mb (furry' f ma)
 
 -- Exercise 17
 -- Relative Difficulty: 6
 -- (bonus: use apple + banana2)
 banana3 :: forall a b c d m. Misty m => (a -> b -> c -> d) -> m a -> m b -> m c -> m d
-banana3 = unsafeCoerce "todo"
+banana3 f ma mb mc = apple mc (banana2 f ma mb)
 
 -- Exercise 18
 -- Relative Difficulty: 6
 -- (bonus: use apple + banana3)
 banana4 :: forall a b c d e m. Misty m => (a -> b -> c -> d -> e) -> m a -> m b -> m c -> m d -> m e
-banana4 = unsafeCoerce "todo"
+banana4 f ma mb mc md = apple md (banana3 f ma mb mc)
 
 newtype State s a = State {
   state :: (s -> Tuple s a)
