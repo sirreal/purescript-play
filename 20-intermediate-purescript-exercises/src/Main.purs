@@ -5,6 +5,7 @@ import Data.List
 import Data.Maybe
 import Data.Either
 import Data.Tuple
+import Data.Newtype
 
 import Unsafe.Coerce (unsafeCoerce)
 
@@ -133,18 +134,18 @@ banana3 f ma mb mc = apple mc (banana2 f ma mb)
 banana4 :: forall a b c d e m. Misty m => (a -> b -> c -> d -> e) -> m a -> m b -> m c -> m d -> m e
 banana4 f ma mb mc md = apple md (banana3 f ma mb mc)
 
-newtype State s a = State {
-  state :: (s -> Tuple s a)
-}
+newtype State s a = State s a
+
+derive instance newtypeState :: Newtype (State (Tuple s a)) _
 
 -- Exercise 19
 -- Relative Difficulty: 9
 instance fluffyState :: Fluffy (State s) where
-  furry = unsafeCoerce "todo"
+  furry f s = State (\x -> Tuple x (f ((unwrap s) x)))
 
 -- Exercise 20
 -- Relative Difficulty: 10
 instance mistyState :: Misty (State s) where
-  banana = unsafeCoerce "todo"
-  unicorn = unsafeCoerce "todo"
+  banana f s = f (unwrap s)
+  unicorn x = State (\s -> Tuple s x)
   furry' f ma = defaultMistyFurry' f ma
