@@ -7,8 +7,6 @@ import Data.Maybe (Maybe(..))
 import Data.Newtype (class Newtype, unwrap)
 import Data.Tuple (Tuple(..), fst, snd)
 
-import Unsafe.Coerce (unsafeCoerce)
-
 class Fluffy f where
   furry :: forall a b. (a -> b) -> f a -> f b
 
@@ -73,7 +71,7 @@ instance mistyMaybe :: Misty Maybe where
 -- Exercise 9
 -- Relative Difficulty: 6
 instance mistyFunc :: Misty ((->) t) where
-  banana = unsafeCoerce "todo"
+  banana f g = \x -> f (g x) x
   unicorn = const
   furry' f ma = defaultMistyFurry' f ma
 
