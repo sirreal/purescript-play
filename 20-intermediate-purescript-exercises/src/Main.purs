@@ -2,10 +2,10 @@ module Main where
 
 import Prelude
 import Data.List
-import Data.Maybe
-import Data.Either
-import Data.Tuple
-import Data.Newtype
+import Data.Either (Either(..))
+import Data.Maybe (Maybe(..))
+import Data.Newtype (class Newtype, unwrap)
+import Data.Tuple (Tuple(..), fst, snd)
 
 import Unsafe.Coerce (unsafeCoerce)
 
@@ -134,25 +134,27 @@ banana3 f ma mb mc = apple mc (banana2 f ma mb)
 banana4 :: forall a b c d e m. Misty m => (a -> b -> c -> d -> e) -> m a -> m b -> m c -> m d -> m e
 banana4 f ma mb mc md = apple md (banana3 f ma mb mc)
 
-newtype State s a = State { state :: s -> Tuple s a }
+newtype State s a = State (s -> Tuple s a)
 
-instance newtypeState :: Newtype (State s a) { state :: s -> Tuple s a } where
+instance newtypeState :: Newtype (State s a) (s -> Tuple s a) where
   wrap = State
   unwrap (State s) = s
 
 -- Exercise 19
 -- Relative Difficulty: 9
 instance fluffyState :: Fluffy (State s) where
-  furry f state = State { state: \s -> let prev = (unwrap state) s
-                                       in  Tuple (fst prev) (f (snd prev))
-                  }
+  furry f state = State (\s -> let prev = (unwrap state) s
+                               in  Tuple (fst prev) (f (snd prev))
+                  )
 
 -- Exercise 20
 -- Relative Difficulty: 10
 instance mistyState :: Misty (State s) where
-  banana f s =
-    let prev = unwrap s
-        next x = \y -> let tab = prev x in Tuple y (unwrap f (snd tab))
-    in  State { state: next }
-  unicorn x = State { state: \s -> Tuple s x }
+  banana f s = State (
+    \x -> let prev = unwrap s x
+              y = fst prev
+              a = snd prev
+          in unwrap (f a) y
+  )
+  unicorn x = State (\s -> Tuple s x)
   furry' f ma = defaultMistyFurry' f ma
